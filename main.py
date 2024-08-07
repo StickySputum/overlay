@@ -38,14 +38,6 @@ class TimerOverlay:
         self.root.withdraw()
         self.check_dota_running()  # Начинаем проверку процесса
     
-    def kill_process_by_name(name):
-        for proc in psutil.process_iter(['name']):
-            if proc.info['name'] == name:
-                proc.kill()  # Убивает процесс
-                print(f'Процесс {name} (PID: {proc.pid}) завершен.')
-
-
-    
     def check_dota_running(self):
         """Проверяет, запущен ли процесс Dota 2 и управляет видимостью таймера."""
         if any(proc.name() == "dota2.exe" for proc in psutil.process_iter()):
@@ -58,7 +50,7 @@ class TimerOverlay:
             self.root.destroy()  # Закрываем окно таймера
             os._exit(0)  # Завершаем выполнение скрипта
             sys.exit()
-            kill_process_by_name('main.exe')
+            
 
         # Проверка каждую секунду
         self.root.after(1000, self.check_dota_running)
