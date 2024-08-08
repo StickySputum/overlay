@@ -32,7 +32,7 @@ class TimerOverlay:
             print(f"Ошибка загрузки звука: {e}")
 
         # Настройка горячей клавиши
-        keyboard.add_hotkey('shift+.', self.toggle_timer)
+        keyboard.add_hotkey('shift+caps lock', self.toggle_timer)
 
         # Скрываем окно таймера до тех пор, пока не запустится Dota 2
         self.root.withdraw()
