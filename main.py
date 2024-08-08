@@ -11,13 +11,22 @@ class TimerOverlay:
         self.root = root
         self.root.title("Таймер")
         self.root.attributes('-topmost', True)
-        self.root.geometry(f'250x150+{x}+{y}')
+        self.root.geometry(f'300x200+{x}+{y}')
 
         self.label = tk.Label(root, text='08:00', font=('Helvetica', 48), fg='white', bg='black')
         self.label.pack(expand=True)
 
-        self.total_time = 480  # 8 минут
-        self.remaining_time = self.total_time
+        self.entry_label = tk.Label(root, text='Введите время (мин):', bg='black', fg='white')
+        self.entry_label.pack()
+
+        self.time_entry = tk.Entry(root, font=('Helvetica', 24))
+        self.time_entry.pack()
+
+        self.start_button = tk.Button(root, text='Начать', command=self.set_timer)
+        self.start_button.pack()
+
+        self.total_time = 0
+        self.remaining_time = 0
         self.running = False
         self.can_toggle = True  # Флаг для блокировки нажатий
 
@@ -32,8 +41,16 @@ class TimerOverlay:
         # Настройка горячей клавиши
         keyboard.add_hotkey('shift+.', self.toggle_timer)
 
-
-    
+    def set_timer(self):
+        """Устанавливает таймер на введенное пользователем количество минут."""
+        try:
+            minutes = int(self.time_entry.get())
+            self.total_time = minutes * 60  # Конвертация в секунды
+            self.remaining_time = self.total_time
+            self.label.config(text=f'{minutes:02d}:00')  # Обновление метки
+            self.time_entry.delete(0, tk.END)  # Очистка поля ввода
+        except ValueError:
+            self.label.config(text='Ошибка ввода!')  # Сообщение об ошибке
 
     def toggle_timer(self):
         if self.can_toggle:
@@ -59,7 +76,7 @@ class TimerOverlay:
 
     def reset_timer(self):
         self.running = False
-        self.remaining_time = self.total_time
+        self.remaining_time = 0
         self.label.config(text='08:00')
 
     def update_timer(self):
