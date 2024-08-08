@@ -5,15 +5,13 @@ import pygame
 import psutil
 import sys
 import os
+
 class TimerOverlay:
     def __init__(self, root, x, y):
         self.root = root
-        self.root.overrideredirect(True)
+        self.root.title("Таймер")
         self.root.attributes('-topmost', True)
         self.root.geometry(f'250x150+{x}+{y}')
-        
-        self.root.wm_attributes('-transparentcolor', 'black')
-        self.root.config(bg='black')
 
         self.label = tk.Label(root, text='08:00', font=('Helvetica', 48), fg='white', bg='black')
         self.label.pack(expand=True)
@@ -32,28 +30,10 @@ class TimerOverlay:
             print(f"Ошибка загрузки звука: {e}")
 
         # Настройка горячей клавиши
-        keyboard.add_hotkey('shift+caps lock', self.toggle_timer)
+        keyboard.add_hotkey('shift+.', self.toggle_timer)
 
-        # Скрываем окно таймера до тех пор, пока не запустится Dota 2
-        self.root.withdraw()
-        self.check_dota_running()  # Начинаем проверку процесса
+
     
-    def check_dota_running(self):
-        """Проверяет, запущен ли процесс Dota 2 и управляет видимостью таймера."""
-        if any(proc.name() == "dota2.exe" for proc in psutil.process_iter()):
-            self.root.deiconify()  # Показываем таймер
-        else:
-            self.root.withdraw()  # Скрываем таймер
-
-        # Если таймер видим и Dota 2 закрыта, завершаем выполнение программы
-        if self.root.winfo_viewable() and not any(proc.name() == "dota2.exe" for proc in psutil.process_iter()):
-            self.root.destroy()  # Закрываем окно таймера
-            os._exit(0)  # Завершаем выполнение скрипта
-            sys.exit()
-            
-
-        # Проверка каждую секунду
-        self.root.after(1000, self.check_dota_running)
 
     def toggle_timer(self):
         if self.can_toggle:
@@ -96,12 +76,6 @@ class TimerOverlay:
                 print(f"Ошибка воспроизведения звука окончания таймера: {e}")
             self.reset_timer()
 
-def make_window_clickthrough(hwnd):
-    styles = ctypes.windll.user32.GetWindowLongW(hwnd, -20)
-    ctypes.windll.user32.SetWindowLongW(hwnd, -20, styles | 0x80000 | 0x20)
-    ctypes.windll.user32.SetWindowPos(hwnd, None, 0, 0, 0, 0,
-                                      0x0001 | 0x0002 | 0x0040)
-
 def get_second_monitor_position():
     user32 = ctypes.windll.user32
     primary_width = user32.GetSystemMetrics(0)
@@ -115,8 +89,5 @@ if __name__ == '__main__':
     root = tk.Tk()
     x, y = get_second_monitor_position()
     timer = TimerOverlay(root, x, y)
-
-    hwnd = ctypes.windll.user32.GetForegroundWindow()
-    make_window_clickthrough(hwnd)
 
     root.mainloop()
